@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>ڕیزبەندیی بارەکان</title>
+<style>
+body {
+  font-family: sans-serif;
+  background: #eee;
+  padding: 10px;
+  margin: 0;
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  margin: auto;
+  padding: 7mm 6mm;
+  box-sizing: border-box;
+  page-break-after: avoid;
+  page-break-inside: avoid;
+  overflow: visible;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11.5px;
+}
+
+td {
+  padding: 1px 0px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.header-table td {
+  border: none;
+  padding: 1px 2px;
+}
+
+.header-table td {
+  border: none;
+  padding: 4px 2px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.header-input {
+  border: none;
+  border-bottom: 1px solid #999;
+  background: transparent;
+  font-size: 11px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.header-input {
+  width: 95%;
+  border: none;
+  border-bottom: 1px solid #999;
+  text-align: center;
+  background: transparent;
+  font-size: 11px;
+}
+
+.lists {
+  display: flex;
+  gap: 2px;
+  margin-top: 5px;
+}
+
+.list-table {
+  width: 45%;
+}
+
+.name-cell {
+  text-align: right;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-right: 6px;
+}
+
+/* --- new: editable row number + ↕️ button --- */
+.row-number-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.row-number-input {
+  width: 32px;
+  padding: 3px 1px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: center;
+  background: white;
+}
+
+.move-updown-btn {
+  background: #2a7f6e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+}
+
+.move-updown-btn:hover {
+  background: #1e5f51;
+}
+
+/* --- toolbar --- */
+.toolbar {
+  text-align: center;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar button {
+  padding: 6px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background: #0d6efd;
+  color: white;
+  cursor: pointer;
+}
+
+.clear-btn {
+  background: #6c757d;
+}
+
+.clear-btn:hover {
+  background: #5a6268;
+}
+
+/* --- PRINT: hide toolbar AND hide the move UI completely --- */
+@media print {
+  body { background: white; }
+  
+  /* 🖨️ completely remove toolbar and move controls */
+  .toolbar { display: none !important; }
+  
+  .row-number-container .move-updown-btn,
+  .row-number-container .row-number-input {
+    display: none !important;
+  }
+
+  /* show only the plain row number (as static text) */
+  .row-number-container span.static-row-number {
+    display: inline !important;
+    font-weight: normal;
+  }
+  .row-number-input, .move-updown-btn {
+    display: none !important;
+  }
+
+  /* clean column borders */
+  td {
+    border: 1px solid #000;
+    padding: 3px 2px;
+  }
+
+  .page {
+    margin: 0;
+    padding: 5mm 5mm;
+    box-shadow: none;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    height: auto;
+    min-height: 0;
+  }
+
+  .lists, tr, tbody {
+    page-break-inside: avoid;
+  }
+
+  /* ensure column for controls doesn't take space */
+  /* in print: first column shows only static number, no input/button */
+td:first-child {
+  width: 10% !important;
+  padding: 3px 1px;
+}
+.row-number-container {
+  display: block;        /* override flex layout */
+}
+.row-number-input, .move-updown-btn {
+  display: none !important;
+}
+.static-row-number {
+  display: inline !important;
+  font-size: 11px;
+}
+/* hide calendar picker arrow in print */
+input[type=date]::-webkit-calendar-picker-indicator {
+  display: none !important;
+}
+
+input[type=date] {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  border-bottom: 1px solid #999;
+  background: transparent;
+}
+
+/* make header table use full width and spread columns */
+.header-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.header-table td {
+  width: 33.33% !important;
+  text-align: right !important;
+  white-space: nowrap;
+  border: none !important;
+  padding: 4px 2px !important;
+}
+
+/* ensure date and batch inputs keep inline layout */
+.header-table .header-input {
+  display: inline !important;
+  width: auto !important;
+  max-width: 120px;
+}
+}
+
+/* screen: static number hidden, only input+button visible */
+.static-row-number {
+  display: none;
+}
+
+/* remove spinner */
+.row-number-input::-webkit-outer-spin-button,
+.row-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.row-number-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+
+
+
+
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()">🖨️ چاپکردن</button>
+  <button onclick="clearAllCheckboxes()" class="clear-btn">✔️ خاوێنکردنەوە</button>
+</div>
+
+<div class="page">
+
+<table class="header-table">
+<tr>
+  <td>ڕۆژی: <span id="kurdishDayDisplay">-----</span></td>
+  <td>پشتیوان: ٠٧٧٣ ٦٩٨ ٨٠٠٦</td>
+  <td>بان واز شیمال جووت</td>
+</tr>
+<tr>
+  <td>ڕێکەوت: <input id="dateInput" type="date" class="header-input" style="width:auto; display:inline; border-bottom:1px solid #999;"></td>
+  <td>هاوکار: ٠٧٧٠ ٦٩١ ٩٢٩٥</td>
+  <td>کۆمەڵەی: <input id="batchInput" type="number" class="header-input" style="width:80px; display:inline; border-bottom:1px solid #999;"></td>
+</tr>
+</table>
+
+<div class="lists">
+  <table class="list-table" id="table1"></table>
+  <table class="list-table" id="table2"></table>
+</div>
+
+</div>
+
+<script>
+/* ===== FIXED NAMES ===== */
+const names = [
+"حسێن عەلی",
+"گەیلان",
+"گۆران کامەران",
+"هێمن نەجم",
+"فەرهاد",
+"سالار تۆفیق",
+"یوسف",
+"سیروان مەحمود",
+"مستەفا",
+"ئەمیر",
+"جەلال مەحمود",
+"ئەیاد جەلال",
+"کێوان",
+"ئەیاد عەلی",
+"شوانە سەمین",
+"کاروان ئەیوب",
+"سیروان سەلام",
+"عاسی",
+"محەمەد فەیزوڵا",
+"سالار ڕەحیم",
+"ئاکۆ",
+"ئیبراهیم",
+"محەمەد تەها",
+"قاسم",
+"مەحمود",
+"ئیبراهیم خەلیل",
+"هاوکار ساڵح",
+"حەسەن والی",
+"ئەحمەد ئەکبەر",
+"هێمن ئەحمەد",
+"عەلی دارا",
+"مەریوان",
+"سان",
+"دڵشاد",
+"سەرکەوت",
+"ئەیاد جەبار",
+"دانا سەباح",
+"سەربەست",
+"کاوە قاسم",
+"عیرفان",
+"دلێر",
+"دەوەن",
+"ئاسۆ",
+"هۆشەن",
+"خالید",
+"ئاراز",
+"عارف",
+"هەردی",
+"پشتیوان",
+"هونەر نازم",
+"باسم",
+"فازڵ",
+"مەردام",
+"محەمەد جەلیل",
+"شوانە عەدنان",
+"هاوکار عومەر",
+];
+
+/* ===== STORAGE ===== */
+const KEY = "kurdish-list-v5-editable-row";
+
+let state = JSON.parse(localStorage.getItem(KEY)) || {
+  order: [...Array(60).keys()],
+  done: Array(60).fill(false),
+  header: {date:"", batch:""}
+};
+
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(state));
+}
+
+/* ===== HEADER ===== */
+/* ===== HEADER – new version with date + batch only ===== */
+const kurdishDays = [
+  "یەکشەممە", "دووشەممە", "سێشەممە", "چوارشەممە", 
+  "پێنجشەممە", "هەینی", "شەممە"
+];
+
+function updateKurdishDayFromDate(dateString) {
+  const displaySpan = document.getElementById("kurdishDayDisplay");
+  if (!dateString) {
+    displaySpan.textContent = "-----";
+    return;
+  }
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    displaySpan.textContent = "-----";
+    return;
+  }
+  const dayIndex = date.getDay(); // 0 = Sunday
+  displaySpan.textContent = kurdishDays[dayIndex];
+}
+
+// header elements
+const dateInput = document.getElementById("dateInput");
+const batchInput = document.getElementById("batchInput");
+
+// restore saved values
+dateInput.value = state.header.date || "";
+batchInput.value = state.header.batch || "";
+
+// initial day update
+updateKurdishDayFromDate(dateInput.value);
+
+// event listeners – only date and batch are saved
+dateInput.oninput = () => {
+  state.header.date = dateInput.value;
+  state.header.batch = batchInput.value; // keep batch in sync
+  updateKurdishDayFromDate(dateInput.value);
+  save();
+};
+
+batchInput.oninput = () => {
+  state.header.batch = batchInput.value;
+  state.header.date = dateInput.value; // keep date in sync
+  save();
+};
+
+/* ===== MOVE LOGIC – move current row to target row number (1‑based) ===== */
+function moveRowTo(currentIndex, targetPosition) {
+  if (currentIndex < 0 || currentIndex >= 60) return;
+  let targetIdx = targetPosition - 1;
+  if (targetIdx < 0 || targetIdx >= 60) return;
+  if (targetIdx === currentIndex) {
+    render();
+    return;
+  }
+
+  const [movedOrder] = state.order.splice(currentIndex, 1);
+  state.order.splice(targetIdx, 0, movedOrder);
+
+  const [movedDone] = state.done.splice(currentIndex, 1);
+  state.done.splice(targetIdx, 0, movedDone);
+
+  render();
+  save();
+}
+
+/* ===== CLEAR ALL CHECKBOXES ===== */
+function clearAllCheckboxes() {
+  for (let i = 0; i < 60; i++) {
+    state.done[i] = false;
+  }
+  render();
+  save();
+}
+window.clearAllCheckboxes = clearAllCheckboxes;
+
+/* ===== RENDER – editable row number field + ↕️ button ===== */
+function buildTable(table, start, end) {
+  table.innerHTML = "";
+  for (let row = start; row <= end; row++) {
+    const dataIdx = row - 1;
+    const nameIdx = state.order[dataIdx];
+    const personName = names[nameIdx];
+    const isChecked = state.done[dataIdx];
+
+    const tr = document.createElement("tr");
+
+    // ---------- ژمارە (editable row number with ↕️ button) ----------
+    const tdNum = document.createElement("td");
+    tdNum.style.width = "14%";  // room for input + button
+
+    const container = document.createElement("div");
+    container.className = "row-number-container";
+
+    // input field – editable row number (1‑60)
+    const rowInput = document.createElement("input");
+    rowInput.type = "number";
+    rowInput.min = 1;
+    rowInput.max = 60;
+    rowInput.value = row;
+    rowInput.className = "row-number-input";
+    rowInput.placeholder = "ژمارە";
+
+    // static span for PRINT – shows plain number
+    const staticSpan = document.createElement("span");
+    staticSpan.className = "static-row-number";
+    staticSpan.textContent = row;
+
+    // ↕️ button – Unicode up-down arrow
+    const moveBtn = document.createElement("button");
+    moveBtn.className = "move-updown-btn";
+    moveBtn.innerHTML = "↕️";  // up-down arrow symbol
+    moveBtn.title = "بیگوازە بۆ ژمارەی ڕیز";
+    moveBtn.onclick = (e) => {
+      e.stopPropagation();
+      const targetPos = parseInt(rowInput.value, 10);
+      if (!isNaN(targetPos) && targetPos >= 1 && targetPos <= 60) {
+        moveRowTo(dataIdx, targetPos);
+      } else {
+        alert("تکایە ژمارەی ڕیز بکە لە نێوان ١ بۆ ٦٠");
+      }
+    };
+
+    container.appendChild(rowInput);
+    container.appendChild(moveBtn);
+    container.appendChild(staticSpan);  // hidden in screen, shown in print
+    tdNum.appendChild(container);
+
+    // ---------- ناو (name) ----------
+    const tdName = document.createElement("td");
+    tdName.className = "name-cell";
+    tdName.textContent = personName;
+    tdName.style.width = "52%";
+
+    // ---------- چێکبۆکس (checkbox) ----------
+    const tdCheck = document.createElement("td");
+    tdCheck.style.width = "8%";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = isChecked;
+    cb.onchange = () => {
+      state.done[dataIdx] = cb.checked;
+      save();
+    };
+    tdCheck.appendChild(cb);
+
+    tr.append(tdNum, tdName, tdCheck);
+    table.appendChild(tr);
+  }
+}
+
+function render() {
+  buildTable(table1, 1, 30);
+  buildTable(table2, 31, 60);
+}
+
+render();
+
+/* ----- tiny print hooks ----- */
+window.onbeforeprint = function() {
+  // ensure all static numbers are ready – already in DOM
+};
+window.onafterprint = function() {
+  // nothing needed
+};
+</script>
+
+</body>
+</html>
