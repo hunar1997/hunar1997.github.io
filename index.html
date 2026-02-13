@@ -467,6 +467,9 @@ function buildTable(table, start, end) {
     rowInput.value = row;
     rowInput.className = "row-number-input";
     rowInput.placeholder = "ژمارە";
+    rowInput.onfocus=function(){
+	this.select();
+	}
 
     // static span for PRINT – shows plain number
     const staticSpan = document.createElement("span");
