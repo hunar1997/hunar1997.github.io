@@ -345,7 +345,7 @@ const names = [
 "هونەر نازم",
 "باسم",
 "فازڵ",
-"مەردام",
+"مەردان",
 "محەمەد جەلیل",
 "شوانە عەدنان",
 "هاوکار عومەر",
@@ -355,8 +355,8 @@ const names = [
 const KEY = "kurdish-list-v5-editable-row";
 
 let state = JSON.parse(localStorage.getItem(KEY)) || {
-  order: [...Array(60).keys()],
-  done: Array(60).fill(false),
+  order: [...Array(56).keys()],
+  done: Array(56).fill(false),
   header: {date:"", batch:""}
 };
 
@@ -413,9 +413,9 @@ batchInput.oninput = () => {
 
 /* ===== MOVE LOGIC – move current row to target row number (1‑based) ===== */
 function moveRowTo(currentIndex, targetPosition) {
-  if (currentIndex < 0 || currentIndex >= 60) return;
+  if (currentIndex < 0 || currentIndex >= 56) return;
   let targetIdx = targetPosition - 1;
-  if (targetIdx < 0 || targetIdx >= 60) return;
+  if (targetIdx < 0 || targetIdx >= 56) return;
   if (targetIdx === currentIndex) {
     render();
     return;
@@ -433,7 +433,7 @@ function moveRowTo(currentIndex, targetPosition) {
 
 /* ===== CLEAR ALL CHECKBOXES ===== */
 function clearAllCheckboxes() {
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 56; i++) {
     state.done[i] = false;
   }
   render();
@@ -520,8 +520,8 @@ function buildTable(table, start, end) {
 }
 
 function render() {
-  buildTable(table1, 1, 30);
-  buildTable(table2, 31, 60);
+  buildTable(table1, 1, 28);
+  buildTable(table2, 29, 56);
 }
 
 render();
