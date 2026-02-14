@@ -502,7 +502,7 @@ function buildTable(table, start, end) {
     moveBtn.onclick = (e) => {
       e.stopPropagation();
       const targetPos = parseInt(rowInput.value, 10);
-      if (!isNaN(targetPos) && targetPos >= 1 && targetPos <= 60) {
+      if (!isNaN(targetPos) && targetPos >= 1 && targetPos <= 56) {
         moveRowTo(dataIdx, targetPos);
       } else {
         alert("تکایە ژمارەی ڕیز بکە لە نێوان ١ بۆ ٦٠");
