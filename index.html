@@ -477,11 +477,11 @@ function buildTable(table, start, end) {
     const container = document.createElement("div");
     container.className = "row-number-container";
 
-    // input field – editable row number (1‑60)
+    // input field – editable row number (1‑56)
     const rowInput = document.createElement("input");
     rowInput.type = "number";
     rowInput.min = 1;
-    rowInput.max = 60;
+    rowInput.max = 56;
     rowInput.value = row;
     rowInput.className = "row-number-input";
     rowInput.placeholder = "ژمارە";
@@ -505,7 +505,7 @@ function buildTable(table, start, end) {
       if (!isNaN(targetPos) && targetPos >= 1 && targetPos <= 56) {
         moveRowTo(dataIdx, targetPos);
       } else {
-        alert("تکایە ژمارەی ڕیز بکە لە نێوان ١ بۆ ٦٠");
+        alert("تکایە ژمارەی ڕیز بکە لە نێوان ١ بۆ ٥٦");
       }
     };
 
