@@ -420,8 +420,13 @@ dateInput.oninput = () => {
 
 batchInput.oninput = () => {
   state.header.batch = batchInput.value;
-  state.header.date = dateInput.value; // keep date in sync
+  state.header.date = dateInput.value;
   save();
+};
+
+// highlight all text when focused
+batchInput.onfocus = function() {
+  this.select();
 };
 
 /* ===== MOVE LOGIC – move current row to target row number (1‑based) ===== */
